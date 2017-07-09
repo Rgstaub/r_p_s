@@ -1,9 +1,15 @@
-function submit() {
-	var startDate = $("#startDate").val();
-	var endDate = $("#endDate").val();
-	var keywords = $("#keyword").val();
 
-	getArticle(keyword, startDate, endDate);
-}
+// Firebase API key: AIzaSyATz6wrwWUZOobB20cfFDtyGdJKMRDGnX4
 
-$("#submit").on("click", submit);
+
+
+// Initialize Firebase
+var config = {
+apiKey: "AIzaSyATz6wrwWUZOobB20cfFDtyGdJKMRDGnX4",
+authDomain: "rock-paper-scissors-9b720.firebaseapp.com",
+databaseURL: "https://rock-paper-scissors-9b720.firebaseio.com",
+projectId: "rock-paper-scissors-9b720",
+storageBucket: "rock-paper-scissors-9b720.appspot.com",
+messagingSenderId: "392615458043"
+};
+firebase.initializeApp(config);
