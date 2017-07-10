@@ -6,11 +6,29 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 	<link rel="stylesheet" type="text/css" href="css/style.css">
-	<script src="https://cdn.firebase.com/js/client/2.4.2/firebase.js"></script>
-	<title>Rock Paper Scissor</title>
+	<script src="https://www.gstatic.com/firebasejs/live/3.0/firebase.js"></script>
+	<title>Rock Paper Scissors</title>
 </head>
 <body>
 	
+	<h1 id="testTitle">test</h1>
+
+	<form id="nameInput" class="form-inline">
+  		<label class="" for="usernameInput">Player Name</label>
+  		<input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="usernameInput" placeholder="Jane Doe">
+
+ 		<div class="form-check mb-2 mr-sm-2 mb-sm-0">
+  			<label class="form-check-label">
+      			<input class="form-check-input" type="checkbox"> Remember me
+    		</label>
+ 		 </div>
+
+  <button type="submit" class="btn btn-primary">Submit</button>	
+
+	<button id="counterButton">Click Here</button>
+	<button id="rockButton">Rock</button>
+	<button id="paperButton">Paper</button>
+	<button id="scissorsButton">Scissors</button>
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
