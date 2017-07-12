@@ -22,7 +22,6 @@ var config = {
 		storageBucket: "rock-paper-scissors-9b720.appspot.com",
 		messagingSenderId: "392615458043"
 	};
-
 firebase.initializeApp(config);
 
 // Set global variables
@@ -59,48 +58,49 @@ function addPlayer(x) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+//	ADD PLAYER MODULE
 //================================================================================
 
-// Test counter click
-$('#counterButton').on("click", function() {
-	event.preventDefault();
-	clickCounter++;
-	database.ref().set({
-		clickCount: clickCounter
-	})
-})
 
 $('#playerNameSubmit').on('click', function() {
 	event.preventDefault();
-	if ($('#usernameInput').val().trim() !== "") {
-		if (playerCount === 0) {
-			addPlayer(1);
-			playerCount++;
-		}
-		else if (playerCount === 1) {
-			addPlayer(2);
-			playerCount++; 
-		}
-		else {
-			tooManyPlayers();
-		}
+	// if ($('#usernameInput').val().trim() !== "") {
+	// 	if (playerCount === 0) {
+	// 		addPlayer(1);
+	// 		playerCount++;
+	// 	}
+	// 	else if (playerCount === 1) {
+	// 		addPlayer(2);
+	// 		playerCount++; 
+	// 	}
+	// 	else {
+	// 		tooManyPlayers();
+	// 	}
+	// }
+	// else {
+	// 	alert("null value");
+	// }
+
+	//create a new player object
+	var newPlayer = {
+		name: $('#usernameInput').val().trim(),
+		id: $('#usernameInput').val().trim() + Date.now(),
+		wins: 0,
+		losses: 0
 	}
-	else {
-		alert("null value");
+	console.log(newPlayer.name);
+	console.log(newPlayer.id);
+	// add the player's id to session storage or local storage if "remember me" is checked
+	if ($("input[type='checkbox']").is(':checked')) {
+		localStorage.setItem('myID', newPlayer.id);
+		sessionStorage.setItem('myID', newPlayer.id);
+	} else {
+		sessionStorage.setItem('myID', newPlayer.id);
+		localStorage.setItem('myID', "");
 	}
+
+	var key = database.ref().push(newPlayer).key;
+	console.log(database.ref('/' + key + "/id").set(key));
 })
 
 
