@@ -27,69 +27,83 @@ firebase.initializeApp(config);
 // Set global variables
 var database = firebase.database();
 var clickCounter = 0;
-var scoreboard = $('#testTitle');
 var playerCount = 0;
+var signedIn = false;
+
+if(sessionStorage.myID) {
+	
+	var myKey = sessionStorage.myID;
+	console.log(myKey);
+
+
+}
+
+database.ref("/users/" + myKey).on('value', function(snap) {
+	var name = snap.val().name;
+	console.log(name);
+	$('#playerNameDisplay').text(name);
+});
+
+var player = {};
 
 //===============================================================================
 
-function tooManyPlayers() {
-	alert("Too many players! :P");
-}
+var newPlayerSubmit = $('#playerNameSubmit');
+var newPlayerInput = $('usernameInput');
+var playerNameDisplay = $('playerNameDisplay');
 
-function addPlayer(x) {
-	console.log("player " + x + ": " + $('#usernameInput').val().trim());
-	var player = $('#usernameInput').val().trim();
-	if ($("input[type='checkbox']").is(':checked')) {
-		localStorage.setItem('myName', player);
-		sessionStorage.setItem('myName', player);
-	} else {
-		sessionStorage.setItem('myName', player);
-	}
-	if (x === 1) {
-		database.ref().set({
-			player1: player
-		})
-	} else if (x === 2) {
-		database.ref().set({
-			player2: player
-		})
-	}
-}
+
+
+
+
+
+// function tooManyPlayers() {
+// 	alert("Too many players! :P");
+// }
+
+// function addPlayer(x) {
+// 	console.log("player " + x + ": " + $('#usernameInput').val().trim());
+// 	var player = $('#usernameInput').val().trim();
+// 	if ($("input[type='checkbox']").is(':checked')) {
+// 		localStorage.setItem('myName', player);
+// 		sessionStorage.setItem('myName', player);
+// 	} else {
+// 		sessionStorage.setItem('myName', player);
+// 	}
+// 	if (x === 1) {
+// 		database.ref().set({
+// 			player1: player
+// 		})
+// 	} else if (x === 2) {
+// 		database.ref().set({
+// 			player2: player
+// 		})
+// 	}
+// }
 
 
 
 //	ADD PLAYER MODULE
 //================================================================================
 
-
+// Handle a new player submission
 $('#playerNameSubmit').on('click', function() {
 	event.preventDefault();
-	// if ($('#usernameInput').val().trim() !== "") {
-	// 	if (playerCount === 0) {
-	// 		addPlayer(1);
-	// 		playerCount++;
-	// 	}
-	// 	else if (playerCount === 1) {
-	// 		addPlayer(2);
-	// 		playerCount++; 
-	// 	}
-	// 	else {
-	// 		tooManyPlayers();
-	// 	}
-	// }
-	// else {
-	// 	alert("null value");
-	// }
 
 	//create a new player object
 	var newPlayer = {
 		name: $('#usernameInput').val().trim(),
-		id: $('#usernameInput').val().trim() + Date.now(),
+		id: "placeholder",
 		wins: 0,
 		losses: 0
 	}
 	console.log(newPlayer.name);
-	console.log(newPlayer.id);
+
+
+	var key = database.ref('/users').push(newPlayer).key;
+	newPlayer.id = key;
+	database.ref('/users/' + key + '/id').set(key);
+
 	// add the player's id to session storage or local storage if "remember me" is checked
 	if ($("input[type='checkbox']").is(':checked')) {
 		localStorage.setItem('myID', newPlayer.id);
@@ -98,18 +112,12 @@ $('#playerNameSubmit').on('click', function() {
 		sessionStorage.setItem('myID', newPlayer.id);
 		localStorage.setItem('myID', "");
 	}
-
-	var key = database.ref().push(newPlayer).key;
-	console.log(database.ref('/' + key + "/id").set(key));
 })
-
 
 
 
 
 database.ref().on("value", function(snapshot) {
-	console.log(snapshot.val());
-	scoreboard.text(snapshot.val().clickCount);
+	
 })
-
 
