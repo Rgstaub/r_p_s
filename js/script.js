@@ -26,9 +26,92 @@ firebase.initializeApp(config);
 
 // Set global variables
 var database = firebase.database();
-var clickCounter = 0;
 var playerCount = 0;
 var signedIn = false;
+var player = {};
+var opponent = {};
+
+var players = database.ref('/connectedPlayers');
+var myPosition = "";
+var playerA_id = "";
+var playerB_id = ""; 
+
+// reset the database
+function initialize() {
+	database.ref().set("");
+	database.ref('/connectedPlayers').set(0);
+	reload();
+
+}
+
+// Check if the player is signed in
+
+function signInCheck() {
+	if (sessionStorage.myID) {
+		console.log("Temporarily signed in as ");
+		var signedIn = true;
+		database.ref("/users/" + sessionStorage.myID).on('value', function(snap) {
+			var name = snap.val().name;
+			console.log(name);
+			$('#playerNameDisplay').text(name);
+			player = snap.val();
+			setPlayer();
+		})
+     
+	} else if (localStorage.myID) {
+		console.log("Permanently signed in as ");
+		var signedIn = true;
+	} else {
+		$('#nameInput').toggleClass("hidden");
+		$('#signOut').toggleClass("hidden");
+		$('#playerNameDisplay').text("Sign in with a Player Name");
+	}
+}
+
+function setPlayer() {
+	
+	players.once('value', function(snap) {
+		console.log(snap.val());
+
+		if (snap.val() === 1) {
+			console.log("you are the second player");
+			database.ref('/playerB').set(sessionStorage.myID);
+			players.set(2);
+		} else if (snap.val() === 0) {
+			console.log("you are the first player");
+			database.ref('/playerA').set(sessionStorage.myID);
+			players.set(1);
+		} else {
+			alert("Game is full. Please wait");
+		}
+	})
+}
+
+database.ref('/playerA').on('value', function(snap) {
+	playerA_id = snap.val();
+})
+
+database.ref('/playerB').on('value', function(snap) {
+	playerB_id = snap.val();
+})
+
+// If signed in, check if there are open spots in the game
+
+
+// If not signed in, display the signin form
+
+
+// if open spots exist, put player into the game and update number of open spots
+
+
+// If no open spots exist, display message and wait for open spot
+
+
+// Once in the game, check if there is an opponent. If opponent exists, begin the game
+
+
+// Get choice from each player, determine outcome, append results to page
+
 
 if(sessionStorage.myID) {
 	
@@ -38,19 +121,16 @@ if(sessionStorage.myID) {
 
 }
 
-database.ref("/users/" + myKey).on('value', function(snap) {
-	var name = snap.val().name;
-	console.log(name);
-	$('#playerNameDisplay').text(name);
-});
+// database.ref("/users/" + myKey).on('value', function(snap) {
+// 	var name = snap.val().name;
+// 	console.log(name);
+// 	$('#playerNameDisplay').text(name);
+// });
 
-var player = {};
+
 
 //===============================================================================
 
-var newPlayerSubmit = $('#playerNameSubmit');
-var newPlayerInput = $('usernameInput');
-var playerNameDisplay = $('playerNameDisplay');
 
 
 
@@ -93,25 +173,36 @@ $('#playerNameSubmit').on('click', function() {
 	//create a new player object
 	var newPlayer = {
 		name: $('#usernameInput').val().trim(),
-		id: "placeholder",
 		wins: 0,
-		losses: 0
+		losses: 0,
+		rockCount: 0,
+		paperCount: 0,
+		scissorsCount: 0
 	}
 	console.log(newPlayer.name);
 
 
-	var key = database.ref('/users').push(newPlayer).key;
-	newPlayer.id = key;
-	database.ref('/users/' + key + '/id').set(key);
 
-	// add the player's id to session storage or local storage if "remember me" is checked
+	// Add the newPlayer to the database and store the key
+	var key = database.ref('/users').push(newPlayer).key;
+
+	// add the player's id (key) to session storage or local storage if "remember me" is checked
 	if ($("input[type='checkbox']").is(':checked')) {
-		localStorage.setItem('myID', newPlayer.id);
-		sessionStorage.setItem('myID', newPlayer.id);
+		localStorage.setItem('myID', key);
+		sessionStorage.setItem('myID', key);
 	} else {
-		sessionStorage.setItem('myID', newPlayer.id);
-		localStorage.setItem('myID', "");
+		sessionStorage.setItem('myID', key);
+		localStorage.removeItem('myID');
 	}
+
+	database.ref('/users/' + key).on('value', function(snapshot) {
+		console.log(snapshot.val().name);
+		$('#playerNameDisplay').text(snapshot.val().name);
+	})
+
+	$('#nameInput').toggleClass("hidden");
+	$('#signOut').toggleClass("hidden");
+	signInCheck();
 })
 
 
@@ -121,3 +212,15 @@ database.ref().on("value", function(snapshot) {
 	
 })
 
+// check and log the player in if possible on load
+signInCheck();
+
+
+
+$('#signOut').on('click', function() {
+	localStorage.removeItem("myID");
+	sessionStorage.removeItem("myID");
+	// clear out the new username input field
+	$('#usernameInput').val("");
+	signInCheck();
+})
