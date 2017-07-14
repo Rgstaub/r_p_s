@@ -30,6 +30,7 @@ var playerCount = 0;
 var signedIn = false;
 var player = {};
 var opponent = {};
+var playerIDs = [];
 
 var players = database.ref('/connectedPlayers');
 var myPosition = "";
@@ -38,14 +39,12 @@ var playerB_id = "";
 
 // reset the database
 function initialize() {
-	database.ref().set("");
-	database.ref('/connectedPlayers').set(0);
+	database.ref().set(null);
+	database.ref('/players').set(playerIDs);
 	reload();
-
 }
 
 // Check if the player is signed in
-
 function signInCheck() {
 	if (sessionStorage.myID) {
 		console.log("Temporarily signed in as ");
@@ -69,26 +68,22 @@ function signInCheck() {
 }
 
 function setPlayer() {
-	
-	players.once('value', function(snap) {
-		console.log(snap.val());
-
-		if (snap.val() === 1) {
-			console.log("you are the second player");
-			database.ref('/playerB').set(sessionStorage.myID);
-			players.set(2);
-		} else if (snap.val() === 0) {
-			console.log("you are the first player");
-			database.ref('/playerA').set(sessionStorage.myID);
-			players.set(1);
-		} else {
-			alert("Game is full. Please wait");
-		}
-	})
+	if(playerIDs.length === 0) {
+		database.ref('/players/one').set(player.key);
+		myPosition = "one";
+	} else if (playerIDs.length === 1) {
+		database.ref('/players/two').set(player.key);
+		myPosition = "two"
+	} else {
+		alert("All spots are full. Please wait");
+	}
 }
+
+database.ref('/players').onDisconnect().update({myPosition: null});
 
 database.ref('/playerA').on('value', function(snap) {
 	playerA_id = snap.val();
+}
 })
 
 database.ref('/playerB').on('value', function(snap) {
@@ -113,53 +108,7 @@ database.ref('/playerB').on('value', function(snap) {
 // Get choice from each player, determine outcome, append results to page
 
 
-if(sessionStorage.myID) {
-	
-	var myKey = sessionStorage.myID;
-	console.log(myKey);
-
-
-}
-
-// database.ref("/users/" + myKey).on('value', function(snap) {
-// 	var name = snap.val().name;
-// 	console.log(name);
-// 	$('#playerNameDisplay').text(name);
-// });
-
-
-
 //===============================================================================
-
-
-
-
-
-
-
-// function tooManyPlayers() {
-// 	alert("Too many players! :P");
-// }
-
-// function addPlayer(x) {
-// 	console.log("player " + x + ": " + $('#usernameInput').val().trim());
-// 	var player = $('#usernameInput').val().trim();
-// 	if ($("input[type='checkbox']").is(':checked')) {
-// 		localStorage.setItem('myName', player);
-// 		sessionStorage.setItem('myName', player);
-// 	} else {
-// 		sessionStorage.setItem('myName', player);
-// 	}
-// 	if (x === 1) {
-// 		database.ref().set({
-// 			player1: player
-// 		})
-// 	} else if (x === 2) {
-// 		database.ref().set({
-// 			player2: player
-// 		})
-// 	}
-// }
 
 
 
@@ -173,6 +122,7 @@ $('#playerNameSubmit').on('click', function() {
 	//create a new player object
 	var newPlayer = {
 		name: $('#usernameInput').val().trim(),
+		key: "placeholder",
 		wins: 0,
 		losses: 0,
 		rockCount: 0,
@@ -185,7 +135,8 @@ $('#playerNameSubmit').on('click', function() {
 
 	// Add the newPlayer to the database and store the key
 	var key = database.ref('/users').push(newPlayer).key;
-
+	newPlayer.key = key;
+	
 	// add the player's id (key) to session storage or local storage if "remember me" is checked
 	if ($("input[type='checkbox']").is(':checked')) {
 		localStorage.setItem('myID', key);
@@ -195,9 +146,10 @@ $('#playerNameSubmit').on('click', function() {
 		localStorage.removeItem('myID');
 	}
 
-	database.ref('/users/' + key).on('value', function(snapshot) {
-		console.log(snapshot.val().name);
-		$('#playerNameDisplay').text(snapshot.val().name);
+	database.ref('/users/' + key).on('value', function(snap) {
+		console.log(snap.val().name);
+		$('#playerNameDisplay').text(snap.val().name);
+		database.ref('/users/' + key + '/key').set(key);
 	})
 
 	$('#nameInput').toggleClass("hidden");
@@ -208,8 +160,12 @@ $('#playerNameSubmit').on('click', function() {
 
 
 
-database.ref().on("value", function(snapshot) {
-	
+database.ref('/players').on("value", function(snap) {
+	if (snap.val().one) {
+		playerIDs[0] = snap.val().one;
+	} if (snap.val().two) {
+		playerIDs[1] = snap.val().two;
+	}
 })
 
 // check and log the player in if possible on load
@@ -222,5 +178,8 @@ $('#signOut').on('click', function() {
 	sessionStorage.removeItem("myID");
 	// clear out the new username input field
 	$('#usernameInput').val("");
+	var position = playerIDs.indexOf(player.key);
+	console.log(position);
+	playerIDs.splice(position, 1);
 	signInCheck();
 })
