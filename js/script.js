@@ -33,6 +33,8 @@ const playersRef = database.ref('/players');
 var player = {};
 var opponent = {};
 var playerIDs = [];
+var myID;
+var oppID;
 var host = false;
 
 
@@ -54,10 +56,22 @@ openSpotsRef.on('value', function(snap) {
 	console.log(openSpots);
 })
 
-database.ref('/players').on('value', function(snap) {
+database.ref('players').on('value', function(snap) {
 	var playerArr = Object.keys(snap.val());
 	console.log(playerArr);
 	playerIDs = playerArr;
+	for (var i = 0; i < playerIDs.length; i++) {
+		if (playerIDs[i] === player.key) {
+			return;
+		}
+		else {
+			database.ref('users').once('value', function(snap) {
+				//debugger;
+				console.log(snap.val()[playerIDs[i]]);
+				opponent = snap.val()[playerIDs[i]];
+			})
+		}
+	}
 })
 
 // Check if the player is signed in
@@ -91,13 +105,13 @@ function setPlayer() {
 		openSpots--;
 		openSpotsRef.set(openSpots);
 		var tempKey = database.ref('/players').child(player.key).set(player.name);
-		startGame();
+		//startGame();
 	}
 	else if (openSpots > 0) {
 		openSpots--;
 		openSpotsRef.set(openSpots);
 		var tempKey = database.ref('/players').child(player.key).set(player.name);
-		joinGame();
+		//joinGame();
 	}
 	else {
 		alert("No open Spots");
@@ -116,6 +130,9 @@ function startGame() {
 function shoot(myThrow, oppThrow) {
 
 }
+
+//database.ref('/players/' + ).
+
 // 	if(playerIDs.length === 0) {
 // 		database.ref('/players/one').set(player.key);
 // 		myPosition = "one";
