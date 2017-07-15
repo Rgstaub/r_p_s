@@ -29,7 +29,7 @@ const playerRef = dbRef.ref('players');
 var myPos = ""
 
 $('#playerNameSubmit').on('click', function() {
-	event.preventDefault();
+	event.preventDefault();  
 	var myName = $('#usernameInput').val().trim();
 	var newPlayer = {
 		name: myName,
