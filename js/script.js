@@ -21,9 +21,147 @@ var config = {
 		projectId: "rock-paper-scissors-9b720",
 		storageBucket: "rock-paper-scissors-9b720.appspot.com",
 		messagingSenderId: "392615458043"
-	};
+};
 firebase.initializeApp(config);
 
+const dbRef = firebase.database();
+const playerRef = dbRef.ref('players');
+var myPos = ""
+
+$('#playerNameSubmit').on('click', function() {
+	event.preventDefault();
+	var myName = $('#usernameInput').val().trim();
+	var newPlayer = {
+		name: myName,
+		wins: 0,
+		rps: "",
+	}
+	$('#usernameInput').val(null);
+	dbRef.ref('players').once('value', function(snap) {
+		if (snap.val().playerA.name === "") {
+			dbRef.ref('players/playerA').set(newPlayer);
+			myPos = "playerA";
+			dbRef.ref('players/playerA').once('value', function(snap) {
+				var name = $('<h2>');
+				name.text(snap.val().name);
+				$('#player1').append(name);
+				var score = $('<h4>');
+				score.text("Wins: " + snap.val().wins)
+				$('#player1').append(score);
+			})
+		} else if (snap.val().playerB.name === "") {
+			dbRef.ref('players/playerB').set(newPlayer);
+			myPos = "playerB";
+			dbRef.ref('players/playerB').once('value', function(snap) {
+				var name = $('<h2>')
+				name.text(snap.val().name);
+				$('#player2').append(name);
+				var score = $('<h4>');
+				score.text("Wins: " + snap.val().wins)
+				$('#player2').append(score);				
+			})
+		}
+		else {
+			alert("No open Spots");
+			return;
+		}
+	})
+
+ 
+
+	console.log(newPlayer);
+
+})
+
+
+
+
+
+// Detect connected players
+playerRef.on('value', function(snap) {
+
+})
+
+
+playerRef.onDisconnect().update({
+	playerA: {
+		name: "",
+		wins: "0",
+		rps: "dynamite"
+	},
+	playerB: {
+		name: "",
+		wins: "0",
+		rps: "dynamite"
+	}
+});
+
+
+
+function init() {
+	playerRef.set({
+		playerA: {
+			name: "",
+			wins: "0",
+			rps: "dynamite"
+		},
+		playerB: {
+			name: "",
+			wins: "0",
+			rps: "dynamite"
+		}
+	})
+	refresh();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
 // Set global variables
 const database = firebase.database();
 var openSpots;
@@ -176,6 +314,7 @@ function shoot(myThrow, oppThrow) {
 //================================================================================
 
 // Handle a new player submission
+/*
 $('#playerNameSubmit').on('click', function() {
 	event.preventDefault();
 
@@ -239,3 +378,4 @@ $('#signOut').on('click', function() {
 	//playerIDs[position] = "";
 	signInCheck();
 })
+*/

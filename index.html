@@ -10,9 +10,38 @@
 	<title>Rock Paper Scissors</title>
 </head>
 <body>
+	
+
 	<div class="container">
-	<div class="row">
-	<h1 id="playerNameDisplay">NAME GOES HERE</h1>
+		<div class="row">
+			<form id="nameInput" class="form-inline">
+  				<label class="" for="usernameInput">Player Name</label>
+  				<input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="usernameInput" placeholder="Choose Wisely">
+<!--  		<div class="form-check mb-2 mr-sm-2 mb-sm-0">
+  			<label class="form-check-label">
+      			<input class="form-check-input" type="checkbox"> Remember me
+    		</label>
+ 		</div> -->
+ 		
+ 			<button id="playerNameSubmit" type="submit" class="btn btn-primary">Join Game</button>
+ 		</div>	
+ 	</form>
+		<div id="player1" class="col-md-6">
+			<h3>Player 1</h3>
+			<button id="rockButton">Rock</button>
+			<button id="paperButton">Paper</button>
+			<button id="scissorsButton">Scissors</button>
+			
+		</div>
+		<div id="player2" class="col-md-6">
+			<h3>Player 2</h3>
+			<button id="rockButton">Rock</button>
+			<button id="paperButton">Paper</button>
+			<button id="scissorsButton">Scissors</button>			
+		</div>
+	</div>
+
+<!-- 	<h1 id="playerNameDisplay">NAME GOES HERE</h1>
 
 	<form id="nameInput" class="form-inline hidden">
   		<label class="" for="usernameInput">Player Name</label>
@@ -28,11 +57,8 @@
 
  	<button id='signOut' class='btn btn-primary'>Delete and Create New User</button>
 	</div>
-  	</div>
+  	</div> -->
 
-<!-- 	<button id="rockButton">Rock</button>
-	<button id="paperButton">Paper</button>
-	<button id="scissorsButton">Scissors</button> -->
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
