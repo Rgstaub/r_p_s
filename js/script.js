@@ -41,25 +41,25 @@ $('#playerNameSubmit').on('click', function() {
 		if (snap.val().playerA.name === "") {
 			dbRef.ref('players/playerA').set(newPlayer);
 			myPos = "playerA";
-			dbRef.ref('players/playerA').once('value', function(snap) {
-				var name = $('<h2>');
-				name.text(snap.val().name);
-				$('#player1').append(name);
-				var score = $('<h4>');
-				score.text("Wins: " + snap.val().wins)
-				$('#player1').append(score);
-			})
+			// dbRef.ref('players/playerA').once('value', function(snap) {
+			// 	var name = $('<h2>');
+			// 	name.text(snap.val().name);
+			// 	$('#player1').append(name);
+			// 	var score = $('<h4>');
+			// 	score.text("Wins: " + snap.val().wins)
+			// 	$('#player1').append(score);
+			// })
 		} else if (snap.val().playerB.name === "") {
 			dbRef.ref('players/playerB').set(newPlayer);
 			myPos = "playerB";
-			dbRef.ref('players/playerB').once('value', function(snap) {
-				var name = $('<h2>')
-				name.text(snap.val().name);
-				$('#player2').append(name);
-				var score = $('<h4>');
-				score.text("Wins: " + snap.val().wins)
-				$('#player2').append(score);				
-			})
+			// dbRef.ref('players/playerB').once('value', function(snap) {
+			// 	var name = $('<h2>')
+			// 	name.text(snap.val().name);
+			// 	$('#player2').append(name);
+			// 	var score = $('<h4>');
+			// 	score.text("Wins: " + snap.val().wins)
+			// 	$('#player2').append(score);				
+			// })
 		}
 		else {
 			alert("No open Spots");
@@ -79,7 +79,14 @@ $('#playerNameSubmit').on('click', function() {
 
 // Detect connected players
 playerRef.on('value', function(snap) {
-
+	// var name1 = $('<h2>');
+	// name1.text(snap.val().playerA.name);
+	$('#player1name').text(snap.val().playerA.name);
+	// var score1 = $('<h4>');
+	// score1.text("Wins: " + snap.val().playerA.wins)
+	$('#player1wins').text("Wins: " + snap.val().playerA.wins);
+	$('#player2name').text(snap.val().playerB.name);
+	$('#player2wins').text("Wins: " + snap.val().playerA.wins);
 })
 
 
