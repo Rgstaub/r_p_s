@@ -28,6 +28,18 @@ const dbRef = firebase.database();
 const playerRef = dbRef.ref('players');
 var myPos = ""
 
+function newGame() {
+	setTimeout(function() {
+
+		dbRef.ref('players/playerA/rps').set('dynamite');
+		dbRef.ref('players/playerB/rps').set('dynamite');
+		dbRef.ref('turn').set('a');
+		$('#winner').text("");
+		$('#player1pick').text("");
+		$('#player2pick').text("");
+	}, 5000)
+}
+
 $('#playerNameSubmit').on('click', function() {
 	event.preventDefault();  
 	var myName = $('#usernameInput').val().trim();
@@ -41,72 +53,155 @@ $('#playerNameSubmit').on('click', function() {
 		if (snap.val().playerA.name === "") {
 			dbRef.ref('players/playerA').set(newPlayer);
 			myPos = "playerA";
-			// dbRef.ref('players/playerA').once('value', function(snap) {
-			// 	var name = $('<h2>');
-			// 	name.text(snap.val().name);
-			// 	$('#player1').append(name);
-			// 	var score = $('<h4>');
-			// 	score.text("Wins: " + snap.val().wins)
-			// 	$('#player1').append(score);
-			// })
+			dbRef.ref('turn').set("a");
+			$('#p1buttons').removeClass('hidden');
 		} else if (snap.val().playerB.name === "") {
 			dbRef.ref('players/playerB').set(newPlayer);
 			myPos = "playerB";
-			// dbRef.ref('players/playerB').once('value', function(snap) {
-			// 	var name = $('<h2>')
-			// 	name.text(snap.val().name);
-			// 	$('#player2').append(name);
-			// 	var score = $('<h4>');
-			// 	score.text("Wins: " + snap.val().wins)
-			// 	$('#player2').append(score);				
-			// })
-		}
-		else {
+		} else {
 			alert("No open Spots");
 			return;
 		}
 	})
-
- 
-
 	console.log(newPlayer);
-
+	$('#player1').removeClass('hidden');
+	$('#player2').removeClass('hidden');
+	$('#nameInput').addClass('hidden');
 })
 
+//collect the button input from player 1 and update the DB
+$(document).on('click', '.player1', function() {
+	dbRef.ref('players/playerA').update({
+		rps: this.value
+	})
+	dbRef.ref('turn').set("b");
+	$('#p1buttons').addClass('hidden');
+})
 
-
-
+// collect the button input from player 2, update the DB, and evaluate the result
+$(document).on('click', '.player2', function() {
+	dbRef.ref('players/playerB').update({
+		rps: this.value
+	})
+	$('#p2buttons').addClass('hidden');
+	dbRef.ref('turn').set("z");
+	// compare the values
+	playerRef.once('value', function(snap) {
+		var aPick = snap.val().playerA.rps;
+		var bPick = snap.val().playerB.rps;
+		var aWins = snap.val().playerA.wins;
+		var bWins = snap.val().playerB.wins;
+		var aName = snap.val().playerA.name;
+		var bName = snap.val().playerB.name;
+		if (aPick === "Rock") {
+			if (bPick === "Scissors") {
+				// playerA wins
+				aWins++;
+				dbRef.ref('players/playerA').update({
+					wins: aWins
+				});
+				dbRef.ref('winner').set(aName)						
+			} else if (bPick === "Paper") {
+				//playerB wins
+				bWins++;
+				dbRef.ref('players/playerB').update({
+					wins: bWins
+				});
+				dbRef.ref('winner').set(bName);	
+			} else {
+				//tie
+				dbRef.ref('winner').set("Tie. Nobody");
+			}
+		} else if (aPick === "Paper") {
+			if (bPick === "Rock") {
+				// playerA wins
+				aWins++;
+				dbRef.ref('players/playerA').update({
+					wins: aWins
+				});
+				dbRef.ref('winner').set(aName);		
+			} else if (bPick === "Scissors") {
+				//playerB wins
+				bWins++;
+				dbRef.ref('players/playerB').update({
+					wins: bWins
+				});
+				dbRef.ref('winner').set(bName);					
+			} else {
+				//tie
+				dbRef.ref('winner').set("Tie. Nobody");
+			}
+		} else if (aPick === "Scissors") {
+			if (bPick === "Paper") {
+				// playerA wins
+				aWins++;
+				dbRef.ref('players/playerA').update({
+					wins: aWins
+				});
+				dbRef.ref('winner').set(aName);	
+			} else if (bPick === "Rock") {
+				//playerB wins
+				bWins++;
+				dbRef.ref('players/playerB').update({
+					wins: bWins
+				});
+				dbRef.ref('winner').set(bName);			
+			} else {
+				//tie
+				dbRef.ref('winner').set("Tie. Nobody");
+			}
+		}
+	})
+	
+	newGame();
+})
 
 // Detect connected players
 playerRef.on('value', function(snap) {
-	// var name1 = $('<h2>');
-	// name1.text(snap.val().playerA.name);
 	$('#player1name').text(snap.val().playerA.name);
-	// var score1 = $('<h4>');
-	// score1.text("Wins: " + snap.val().playerA.wins)
 	$('#player1wins').text("Wins: " + snap.val().playerA.wins);
 	$('#player2name').text(snap.val().playerB.name);
-	$('#player2wins').text("Wins: " + snap.val().playerA.wins);
+	$('#player2wins').text("Wins: " + snap.val().playerB.wins);
+})
+
+// A DB listener to adjust the game display depending on which turn it is
+dbRef.ref().on('value', function(snap) {
+	
+	var turn = snap.val().turn;
+	var winner = snap.val().winner;
+	var sv = snap.val()
+	if (turn === 'z') {
+		$('#winner').text(sv.winner + " Wins!");
+		$('#player1pick').text(sv.players.playerA.name + " picked " + sv.players.playerA.rps);
+		$('#player2pick').text(sv.players.playerB.name + " picked " + sv.players.playerB.rps);
+	}
+	if (turn === 'n') {
+		$('#nameInput').removeClass('hidden');
+		$('#player1').addClass('hidden');
+		$('#player2').addClass('hidden');
+		newGame();
+	}
+	if (turn === 'b') {
+		if (myPos === 'playerB') {
+			$('#p2buttons').removeClass('hidden');
+		}
+	}
+	if (turn === 'a') {
+		if (myPos === 'playerA') {
+			$('#p1buttons').removeClass('hidden');
+			$('#winner').text("");
+			$('#player1pick').text("");
+			$('#player2pick').text("");
+
+		}
+	}
 })
 
 
-playerRef.onDisconnect().update({
-	playerA: {
-		name: "",
-		wins: "0",
-		rps: "dynamite"
-	},
-	playerB: {
-		name: "",
-		wins: "0",
-		rps: "dynamite"
-	}
-});
 
-
-
-function init() {
-	playerRef.set({
+// reset the game when one player disconnects
+dbRef.ref().onDisconnect().update({
+	players: {
 		playerA: {
 			name: "",
 			wins: "0",
@@ -117,9 +212,28 @@ function init() {
 			wins: "0",
 			rps: "dynamite"
 		}
-	})
-	refresh();
-}
+	},
+	turn: "n",
+	winner: ""
+});
+
+
+
+// function init() {
+// 	playerRef.set({
+// 		playerA: {
+// 			name: "",
+// 			wins: "0",
+// 			rps: "dynamite"
+// 		},
+// 		playerB: {
+// 			name: "",
+// 			wins: "0",
+// 			rps: "dynamite"
+// 		}
+// 	})
+// 	refresh();
+// }
 
 
 

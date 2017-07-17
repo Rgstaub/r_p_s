@@ -1,3 +1,27 @@
+button {
+	box-shadow: 1px 1px 1px #777;
+}
+
+.header {
+	height: 45px;
+}
+
 .hidden {
 	display: none;
+}
+
+.panel {
+	padding: 15px;
+}
+
+#messageBoard {
+	margin-top: 200px;
+}
+
+.jumbotron {
+	background-image: url("../background2.jpg");
+	background-size: cover;
+	color: #fff;
+	text-align: right;
+	text-shadow: 2px 2px 2px #222;
 }
