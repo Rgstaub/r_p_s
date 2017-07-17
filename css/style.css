@@ -16,6 +16,14 @@ button {
 
 #messageBoard {
 	margin-top: 200px;
+	text-align: center;
+	background-color: #eee;
+	border-radius: 5px;
+}
+
+#chatBox {
+	max-height: 300px;
+	overflow-y: scroll;
 }
 
 .jumbotron {
