@@ -28,9 +28,10 @@ const dbRef = firebase.database();
 const playerRef = dbRef.ref('players');
 var myPos = ""
 
+
+// reset the message board and game variables for a new game
 function newGame() {
 	setTimeout(function() {
-
 		dbRef.ref('players/playerA/rps').set('dynamite');
 		dbRef.ref('players/playerB/rps').set('dynamite');
 		dbRef.ref('turn').set('a');
@@ -40,33 +41,36 @@ function newGame() {
 	}, 5000)
 }
 
+// Add a new player when a name is submitted
 $('#playerNameSubmit').on('click', function() {
 	event.preventDefault();  
-	var myName = $('#usernameInput').val().trim();
-	var newPlayer = {
-		name: myName,
-		wins: 0,
-		rps: "",
-	}
-	$('#usernameInput').val(null);
-	dbRef.ref('players').once('value', function(snap) {
-		if (snap.val().playerA.name === "") {
-			dbRef.ref('players/playerA').set(newPlayer);
-			myPos = "playerA";
-			dbRef.ref('turn').set("a");
-			$('#p1buttons').removeClass('hidden');
-		} else if (snap.val().playerB.name === "") {
-			dbRef.ref('players/playerB').set(newPlayer);
-			myPos = "playerB";
-		} else {
-			alert("No open Spots");
-			return;
+	if ($('#usernameInput').val().trim()) {
+		var myName = $('#usernameInput').val().trim();
+		var newPlayer = {
+			name: myName,
+			wins: 0,
+			rps: "",
 		}
-	})
-	console.log(newPlayer);
-	$('#player1').removeClass('hidden');
-	$('#player2').removeClass('hidden');
-	$('#nameInput').addClass('hidden');
+		$('#usernameInput').val(null);
+		dbRef.ref('players').once('value', function(snap) {
+			if (snap.val().playerA.name === "") {
+				dbRef.ref('players/playerA').set(newPlayer);
+				myPos = "playerA";
+				dbRef.ref('turn').set("a");
+				$('#p1buttons').removeClass('hidden');
+			} else if (snap.val().playerB.name === "") {
+				dbRef.ref('players/playerB').set(newPlayer);
+				myPos = "playerB";
+			} else {
+				alert("No open Spots");
+				return;
+			}
+		})
+		console.log(newPlayer);
+		$('#player1').removeClass('hidden');
+		$('#player2').removeClass('hidden');
+		$('#nameInput').addClass('hidden');
+	} else {return};
 })
 
 //collect the button input from player 1 and update the DB
